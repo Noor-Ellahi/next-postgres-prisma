@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { de } from "zod/v4/locales";
 
 
 
@@ -142,3 +143,6 @@ export async function POST(req: Request) {
         )
     }
 }
+
+
+
