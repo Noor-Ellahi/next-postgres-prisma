@@ -4,6 +4,65 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+
+
+export async function GET(req: Request) {
+
+    try {
+
+        const cookiestore = await cookies();
+        const token = cookiestore.get("token")?.value;
+
+        if (!token) {
+            return new NextResponse(
+                JSON.stringify({
+
+                    error: "Unauthorized"
+                }),
+                { status: 401 }
+            )
+        }
+
+
+        let decoded: any;
+        try {
+            decoded = verifyToken(token);
+
+        } catch (err) {
+            return NextResponse.json(
+                { error: "Invalid token" },
+                { status: 401 }
+            );
+        }
+
+        const find = await prisma.todo.findMany({
+            where : {
+                userId : decoded.id
+            }
+        })
+
+
+        return new NextResponse(
+            JSON.stringify({ todos: find }),
+            { status: 200 }
+        )
+
+
+
+
+    } catch (error) {
+
+        return new NextResponse(
+            JSON.stringify({ message: "An error occurred while fetching todos", error: error instanceof Error ? error.message : String(error) }),
+            { status: 500 }
+        )
+
+    }
+
+
+
+}
+
 export async function POST(req: Request) {
 
     const todoSchema = z.object({
@@ -56,7 +115,7 @@ export async function POST(req: Request) {
         const { title, description } = result.data;
 
         const todo = await prisma.todo.create({
-            data:{
+            data: {
                 title,
                 description,
                 userId: decoded.id
