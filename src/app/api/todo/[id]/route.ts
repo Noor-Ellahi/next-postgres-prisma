@@ -59,12 +59,12 @@ import { z } from "zod";
 const updateTodoSchema = z.object({
   title: z.string().min(1, "Title is required").optional(),
   description: z.string().optional(),
-  completed: z.boolean().optional(),
+  // completed: z.boolean().optional(),
 });
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params:Promise<{ id: string }>  }
 ) {
   try {
     // 1. Get token from cookies
@@ -89,8 +89,8 @@ export async function PATCH(
       );
     }
 
-    const userId = decoded.userId;
-    const todoId = params.id;
+    const userId = decoded.id;
+    const {id : todoId} = await params;
 
     // 3. Validate request body
     const body = await req.json();
@@ -105,8 +105,8 @@ export async function PATCH(
         { status: 400 }
       );
     }
-
-    const { title, description, completed } = result.data;
+    // , completed 
+    const { title, description} = result.data;
 
     // 4. Check if todo exists AND belongs to user
     const existingTodo = await prisma.todo.findFirst({
@@ -131,7 +131,7 @@ export async function PATCH(
       data: {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
-        ...(completed !== undefined && { completed }),
+        // ...(completed !== undefined && { completed }),
       },
     });
 
