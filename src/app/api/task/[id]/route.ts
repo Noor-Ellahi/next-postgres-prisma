@@ -109,7 +109,7 @@ export async function PATCH(
     const { title, description} = result.data;
 
     // 4. Check if todo exists AND belongs to user
-    const existingTodo = await prisma.todo.findFirst({
+    const existingTodo = await prisma.task.findFirst({
       where: {
         id: todoId,
         userId: userId,
@@ -124,7 +124,7 @@ export async function PATCH(
     }
 
     // 5. Update only provided fields
-    const updatedTodo = await prisma.todo.update({
+    const updatedTodo = await prisma.task.update({
       where: {
         id: todoId,
       },

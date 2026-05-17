@@ -39,7 +39,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         const userId = decoded.id;
         const { id: todoID } = await params;
 
-        const deletedTodo = await prisma.todo.deleteMany({
+        const deletedTodo = await prisma.task.deleteMany({
             where: {
                 id: todoID,
                 userId: userId

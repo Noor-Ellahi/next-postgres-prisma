@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { de } from "zod/v4/locales";
 
 
 
@@ -36,9 +35,9 @@ export async function GET(req: Request) {
             );
         }
 
-        const find = await prisma.todo.findMany({
-            where : {
-                userId : decoded.id
+        const find = await prisma.task.findMany({
+            where: {
+                userId: decoded.id
             }
         })
 
@@ -68,7 +67,8 @@ export async function POST(req: Request) {
 
     const todoSchema = z.object({
         title: z.string().min(1, "Title is req"),
-        description: z.string().optional()
+        description: z.string().optional(),
+        listId: z.string().optional()
     })
 
 
@@ -113,13 +113,30 @@ export async function POST(req: Request) {
 
         // console.log(decoded)
 
-        const { title, description } = result.data;
+        const { title, description, listId } = result.data;
 
-        const todo = await prisma.todo.create({
+        if (listId) {
+            const list = await prisma.list.findFirst({
+                where: {
+                    id: listId,
+                    userId: decoded.id
+                }
+            });
+
+            if (!list) {
+                return NextResponse.json(
+                    { error: "Invalid list" },
+                    { status: 400 }
+                );
+            }
+        }
+
+        const todo = await prisma.task.create({
             data: {
                 title,
                 description,
-                userId: decoded.id
+                userId: decoded.id,
+                listId: listId || null
             }
         })
 
