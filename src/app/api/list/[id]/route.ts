@@ -95,3 +95,63 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         )
     }
 }
+
+
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+
+    try {
+        const cookieStore = await cookies()
+        const token = cookieStore.get('token')?.value
+
+        if (!token) {
+            return new NextResponse(
+                JSON.stringify({
+                    error: "Unauthorized!"
+                })
+                , { status: 401 }
+            )
+        }
+
+        let decoded: any;
+
+        try {
+            decoded = verifyToken(token)
+        } catch (error) {
+            return new NextResponse(
+                JSON.stringify({
+                    error: "Invalid Token!"
+                }),
+                { status: 401 }
+            )
+        }
+
+        const { id: listId } = await params;
+
+        const deleteList = await prisma.list.deleteMany({
+            where: {
+                id: listId,
+                userId: decoded.id
+            }
+        })
+        if (deleteList.count === 0) {
+            return NextResponse.json(
+                { error: "Todo not found or unauthorized" },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(
+            { message: "List deleted successfully" },
+            { status: 200 }
+        )
+
+    } catch (error) {
+        console.error(error)
+
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        )
+    }
+}
