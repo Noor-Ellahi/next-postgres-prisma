@@ -1,12 +1,12 @@
 'use client'
+import Link from "next/link";
 import { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 
-
 const LoginComponent = () => {
 
-    const [show , setShow] = useState(true)
+    const [show, setShow] = useState(true)
 
     return (
         // <h1>Hello</h1>
@@ -20,7 +20,7 @@ const LoginComponent = () => {
                 <div className="relative">
                     <input className="border-1 w-full border-[#E9E9E9] text-[12px] py-2 pl-2 outline-none rounded-[4px]" placeholder="*****" type={show ? "password" : "text"} />
                     <span onClick={() => setShow(!show)} className="absolute right-3 top-3 text-[#7c7c7c] text-sm cursor-pointer">
-                        {show ? <FaRegEye/> : <FaRegEyeSlash/>}
+                        {show ? <FaRegEye /> : <FaRegEyeSlash />}
                     </span>
                 </div>
                 <button className="bg-[#FED44D] text-sm rounded-[4px] py-2">Sign in</button>
@@ -35,7 +35,7 @@ const LoginComponent = () => {
                     <button className="rounded-[4px] py-2 text-xs bg-[#EBEBEB] px-12">Google</button>
                 </div>
                 <div className="flex justify-center text-xs font-semibold text-[#444444]">
-                    <p>Dont have an account? Sign up</p>
+                    <Link href={'/register'}><p>Dont have an account? Sign up</p></Link>
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 
 import { prisma } from "@/lib/prisma";
-import LoginComponent from "./components/LoginComp/LoginComponent";
+import { CgMenu } from "react-icons/cg";
 
 
 
@@ -15,9 +15,10 @@ const Home = async () => {
   // const tests = await prisma.test.findMany();
   return(
     <div>
+
+
         {/* {JSON.stringify(tests , null, 2)} */}
         {/* <h1>hi</h1> */}
-        <LoginComponent/>
     </div>
   )
 }
