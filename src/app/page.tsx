@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight } from "react-icons/bi";
+import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight , BiSearch } from "react-icons/bi";
 
 
 
@@ -18,6 +18,13 @@ const Home = () => {
           <div className="flex justify-between">
             <h3 className="text-xl">Menu</h3>
             <BiMenu className="text-3xl text-[#7C7C7C]" onClick={() => setMenu(!menu)}/>
+          </div>
+
+          <div className="relative flex flex-col mt-7.5">
+            <input type="text" className="pl-10 py-2 border outline-none border-[#DCDCDC] rounded-sm" placeholder="Seacrh"/>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2">
+              <BiSearch/>
+            </span>
           </div>
         </div>
         <div className="h-full w-[100%]">
