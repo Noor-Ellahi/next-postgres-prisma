@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight , BiSearch } from "react-icons/bi";
+import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight , BiSearch, BiCalendar, BiListOl, BiGridSmall } from "react-icons/bi";
 
 
 
@@ -14,6 +14,7 @@ const Home = () => {
     <div className="h-screen w-full flex justify-center items-center bg-gray-400">
 
       <div className={`w-[80%] flex rounded-tr-xl ${menu ? "" : "p-5"} rounded-tl-xl bg-[#FAFAFA] h-[90%]`}>
+
         <div className={`w-[25%] p-5 ${menu ? 'hidden' : ''}  bg-[#F2F2F2]`}>
           <div className="flex justify-between">
             <h3 className="text-xl">Menu</h3>
@@ -26,7 +27,19 @@ const Home = () => {
               <BiSearch/>
             </span>
           </div>
+
+          <div className="mt-7.5">
+            <div>
+              <ul className="text-[16px] flex gap-1 flex-col">
+                <li className="text-[12px] text-[#44556B] font-bold">TASKS</li>
+                <li className=" text-[#7C7C7C] flex items-center p-2 gap-3 hover:bg-[red] mt-1"><BiGridSmall className="text-xl"/> All tasks</li>
+                <li className="text-[#7C7C7C] flex items-center p-2 gap-3 hover:bg-[red]"><BiListOl className="text-xl"/> Today</li>
+                <li className="text-[#7C7C7C] flex items-center p-2 gap-3 hover:bg-[red]"><BiCalendar className="text-xl"/>Calender</li>
+              </ul>
+            </div>
+          </div>
         </div>
+
         <div className="h-full w-[100%]">
           <div className={`pl-10 pt-9 ${menu ? '' : 'pl-0 pt-[0px]'}`}>
             <div className="flex gap-25 items-center">
