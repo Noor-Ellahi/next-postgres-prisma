@@ -29,6 +29,13 @@ const Home = () => {
 
   const [popup, setPopup] = useState(false)
   const [dropper, setDropper] = useState(false)
+  const [dueDate, setDueDate] = useState<Date>()
+
+  const [openCalendar, setOpenCalendar] = useState(false)
+
+
+  console.log(dueDate)
+
 
 
   const getList = async () => {
@@ -62,10 +69,10 @@ const Home = () => {
           <div>
             <div className="flex justify-between">
               <h3 className="text-xl">Menu</h3>
-              <BiMenu className="text-3xl text-[#7C7C7C]" onClick={() =>{
-                 setMenu(!menu)
-                 setPopup(false)
-                 }} />
+              <BiMenu className="text-3xl text-[#7C7C7C]" onClick={() => {
+                setMenu(!menu)
+                setPopup(false)
+              }} />
             </div>
 
             <div className="relative flex flex-col mt-7.5">
@@ -200,6 +207,7 @@ const Home = () => {
                       <div className="flex flex-col gap-5 text-xs">
                         <h3>List</h3>
                         <h3>Due date</h3>
+
                       </div>
                       <div className="flex relative flex-col gap-5 text-xs">
                         <h3 onClick={() => setDropper(!dropper)} className="flex items-center gap-3">{selectList ? selectList : "Options"} <GrDown className="text-[8px]" /></h3>
@@ -222,9 +230,18 @@ const Home = () => {
                           ) : null
                         }
 
-                        <h3 className="flex items-center gap-3">15-05-26 <GrDown className="text-[8px]" /></h3>
+
+                        <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(true)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
+                        {
+                          openCalendar ?
+                          <Calendar
+                          date={dueDate}
+                          setDate={setDueDate} 
+                          setOpenCalendar={setOpenCalendar}
+                          />:null
+                        }
                         {/* <input type="date"  /> */}
-                        <Calendar/>
+
 
                       </div>
                     </div>
