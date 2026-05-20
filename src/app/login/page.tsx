@@ -1,10 +1,12 @@
 'use client'
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 
 const LoginComponent = () => {
+    const router = useRouter()
 
     const [show, setShow] = useState(true)
 
@@ -35,7 +37,7 @@ const LoginComponent = () => {
                     <button className="rounded-[4px] py-2 text-xs bg-[#EBEBEB] px-12">Google</button>
                 </div>
                 <div className="flex justify-center text-xs font-semibold text-[#444444]">
-                    <Link href={'/register'}><p>Dont have an account? Sign up</p></Link>
+                    <p>Dont have an account? <span className="cursor-pointer" onClick={() => router.push('/register')}>Sign up</span></p>
                 </div>
             </div>
         </div>

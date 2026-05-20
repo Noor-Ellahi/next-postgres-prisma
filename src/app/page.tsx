@@ -33,6 +33,7 @@ const Home = () => {
 
   const [openCalendar, setOpenCalendar] = useState(false)
 
+  const [task ,setTask] = useState(false)
 
   console.log(dueDate)
 
@@ -231,7 +232,7 @@ const Home = () => {
                         }
 
 
-                        <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(true)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
+                        <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(!openCalendar)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
                         {
                           openCalendar ?
                           <Calendar
