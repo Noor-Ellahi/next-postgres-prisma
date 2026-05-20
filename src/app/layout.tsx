@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Lexend_Deca } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
+
+
 
 const lexend = Lexend_Deca({
   variable: "--font-geist-sans",
@@ -29,7 +32,11 @@ export default function RootLayout({
       lang="en"
       className={`${lexend.className}  h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Toaster />
+      </body>
+
     </html>
   );
 }

@@ -3,6 +3,21 @@
 
 /* * */
 
+/* :root {
+  --success: #FACC15;
+}
+
+[data-sonner-toast][data-type="success"] {
+  --normal-bg: white;
+} */
+
+[data-sonner-toast][data-type="success"] svg {
+  color: #FACC15; /* yellow tick */
+}
+[data-sonner-toast][data-type="error"] svg {
+  color: #f31b1b; /* yellow tick */
+}
+
 /* @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

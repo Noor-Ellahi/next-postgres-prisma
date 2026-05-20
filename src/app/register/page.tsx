@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-
+import { toast } from "sonner";
 
 const RegComp = () => {
 
@@ -34,6 +34,8 @@ const RegComp = () => {
                     password,
                 }
             )
+            toast.success("Account created")
+            router.push('/login')
             console.log(res)
         } catch (error: any) {
             console.log(error.response?.data?.issues)
@@ -41,11 +43,14 @@ const RegComp = () => {
             setError(
                 error.response?.data?.issues || "Something went wrong"
             )
+            toast.error(error.response?.data?.error)
         }
         finally {
             setLoading(false)
         }
     }
+
+    
 
 
     return (
