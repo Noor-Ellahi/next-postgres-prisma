@@ -3,7 +3,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight, BiSearch, BiCalendar, BiListOl, BiGridSmall, BiSolidSquare, BiLogOut, BiCross } from "react-icons/bi";
 import { GrClose, GrDown } from "react-icons/gr";
-import Calendar from "./component/DateComp/DateComp";
+import Calendar from "@/component/DateComp/DateComp";
+import { toast } from "sonner";
 
 // Comp
 
@@ -14,9 +15,16 @@ const Home = () => {
     id: string
     name: string
   }
-  type ListSelect = {
-    name: string
+  type TodoType = {
+    id: string
+    title: string
+    description: string
+    completed: boolean
+    dueDate: string | null
+    userId: string
+    listId: string | null
   }
+
 
   const colors = [
     '#96a4f7ff', '#FE6A6E', '#68D9E7', '#FED44D', '#B4FEB6', '#A580A4'
@@ -33,14 +41,17 @@ const Home = () => {
 
   const [openCalendar, setOpenCalendar] = useState(false)
 
-  const [task ,setTask] = useState(false)
+  const [todo, setTodo] = useState<TodoType[]>([])
 
-  console.log(dueDate)
+  const [task, setTask] = useState(null)
 
+
+
+  const [title, setTitle] = useState('')
 
 
   const getList = async () => {
-    document.cookie = 'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtcDlzZnNhcTAwMDA1Y3Vyd3BudG1ob3AiLCJlbWFpbCI6Im5vb3JAZ21haWwuY29tIiwiaWF0IjoxNzc5MjY3MDI0LCJleHAiOjE3Nzk4NzE4MjR9.eoa8e37B0UfMlv2Spo2TBj5I5TIPNHN5QKuvk0juQPo'
+    // document.cookie = 'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtcDlzZnNhcTAwMDA1Y3Vyd3BudG1ob3AiLCJlbWFpbCI6Im5vb3JAZ21haWwuY29tIiwiaWF0IjoxNzc5MjY3MDI0LCJleHAiOjE3Nzk4NzE4MjR9.eoa8e37B0UfMlv2Spo2TBj5I5TIPNHN5QKuvk0juQPo'
     try {
       const res = await axios.get(
         '/api/list',
@@ -49,15 +60,45 @@ const Home = () => {
 
       )
       setListData(res.data.list)
-      console.log(res.data)
+      // console.log(res.data)
     } catch (error) {
       console.log("error ouccured", error)
     }
   }
 
 
+  const makeTodo = async () => {
+    try {
+      const res = await axios.post(
+        '/api/task', {
+        title
+      }
+      )
+      toast.success("Task Added!")
+      getTodo()
+      setTitle('')
+    } catch (error: any) {
+      toast.error(error.response?.data?.error)
+    }
+  }
+
+  const getTodo = async () => {
+    try {
+      const res = await axios.get(
+        '/api/task',
+      )
+      console.log(res)
+      // setTodo(res.data.todos.reverse())
+      setTodo([...res.data.todos].reverse())
+    } catch (error: any) {
+      toast.error(error.response?.data?.error)
+    }
+  }
+
+
   useEffect(() => {
     getList()
+    getTodo()
   }, [])
 
   return (
@@ -162,21 +203,39 @@ const Home = () => {
 
           <div className="h-[90%] pt-10 flex justify-end pr-15">
             <div className={`w-[85%]  ${menu ? "" : "w-[100%] pl-10"} `}>
-              <div className="relative w-full text-[#7c7c7c]">
-                <BiPlus className="absolute left-5 top-1/2 text-lg -translate-y-1/2" />
+              <div className="flex">
+                <div className="relative w-full text-[#7c7c7c]">
+                  <BiPlus className="absolute left-5 top-1/2 text-lg -translate-y-1/2" />
 
-                <input
-                  type="text"
-                  placeholder="Add New task"
-                  className="pl-12 border-2 outline-none border-[#F3F3F3] p-3 w-full rounded-sm"
-                />
+                  <input
+                    value={title}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        makeTodo()
+                      }
+                    }}
+                    onChange={(e) => setTitle(e.target.value)}
+                    type="text"
+                    placeholder="Add New task"
+                    className="pl-12 border-2 outline-none border-[#F3F3F3] p-3 w-full rounded-sm"
+                  />
+                </div>
+                <button className="text-[#7c7c7c] px-10" onClick={() => makeTodo()}>Enter</button>
               </div>
               <ul className="flex text-[15px] flex-col gap-6 text-[#444444] pt-5 p-2">
-                <li onClick={() => setTaskMenu(!taskMenu)} className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" /> Lorem ipsum dolor sit amet.</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
+                {/* <li onClick={() => setTaskMenu(!taskMenu)} className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" /> Lorem ipsum dolor sit amet.</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
                 <li className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" /> Lorem ipsum dolor sit amet.</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
                 <li className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" /> Lorem ipsum dolor sit amet.</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
                 <li className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" /> Lorem ipsum dolor sit amet.</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
-                <li className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" /> Lorem ipsum dolor sit amet.</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
+                <li className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" /> Lorem ipsum dolor sit amet.</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li> */}
+
+                {
+                  todo?.map((item, index) => {
+                    return (
+                      <li key={index} onClick={() => setTaskMenu(!taskMenu)} className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" />{item.title}</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
+                    )
+                  })
+                }
               </ul>
             </div>
           </div>
@@ -235,11 +294,11 @@ const Home = () => {
                         <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(!openCalendar)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
                         {
                           openCalendar ?
-                          <Calendar
-                          date={dueDate}
-                          setDate={setDueDate} 
-                          setOpenCalendar={setOpenCalendar}
-                          />:null
+                            <Calendar
+                              date={dueDate}
+                              setDate={setDueDate}
+                              setOpenCalendar={setOpenCalendar}
+                            /> : null
                         }
                         {/* <input type="date"  /> */}
 
