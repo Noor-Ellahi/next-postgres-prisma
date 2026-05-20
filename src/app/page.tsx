@@ -3,6 +3,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight, BiSearch, BiCalendar, BiListOl, BiGridSmall, BiSolidSquare, BiLogOut, BiCross } from "react-icons/bi";
 import { GrClose, GrDown } from "react-icons/gr";
+import Calendar from "./component/DateComp/DateComp";
+
+// Comp
 
 
 
@@ -11,8 +14,8 @@ const Home = () => {
     id: string
     name: string
   }
-  type ListSelect ={
-    name : string
+  type ListSelect = {
+    name: string
   }
 
   const colors = [
@@ -22,7 +25,7 @@ const Home = () => {
   const [menu, setMenu] = useState(false)
   const [taskMenu, setTaskMenu] = useState(false)
   const [listData, setListData] = useState<ListType[] | null>(null)
-  const [selectList , setSelectList] = useState<string |null>(null)
+  const [selectList, setSelectList] = useState<string | null>(null)
 
   const [popup, setPopup] = useState(false)
   const [dropper, setDropper] = useState(false)
@@ -59,7 +62,10 @@ const Home = () => {
           <div>
             <div className="flex justify-between">
               <h3 className="text-xl">Menu</h3>
-              <BiMenu className="text-3xl text-[#7C7C7C]" onClick={() => setMenu(!menu)} />
+              <BiMenu className="text-3xl text-[#7C7C7C]" onClick={() =>{
+                 setMenu(!menu)
+                 setPopup(false)
+                 }} />
             </div>
 
             <div className="relative flex flex-col mt-7.5">
@@ -177,7 +183,10 @@ const Home = () => {
                   <div>
                     <div className="flex items-center font-semibold text-[#7c7c7c] justify-between">
                       <h3 className="text-xl">Task:</h3>
-                      <span className="p-1.5" onClick={() => setTaskMenu(false)}><GrClose className="text-lg" /></span>
+                      <span className="p-1.5" onClick={() => {
+                        setTaskMenu(false)
+                        setDropper(false)
+                      }}><GrClose className="text-lg" /></span>
                     </div>
 
                     <div className="mt-8 flex flex-col text-[#444444] gap-6 p-3 text-sm">
@@ -210,10 +219,12 @@ const Home = () => {
                                 })
                               }
                             </ul>
-                          ) :null
+                          ) : null
                         }
 
                         <h3 className="flex items-center gap-3">15-05-26 <GrDown className="text-[8px]" /></h3>
+                        {/* <input type="date"  /> */}
+                        <Calendar/>
 
                       </div>
                     </div>

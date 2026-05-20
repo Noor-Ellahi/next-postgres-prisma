@@ -68,7 +68,8 @@ export async function POST(req: Request) {
     const todoSchema = z.object({
         title: z.string().min(1, "Title is req"),
         description: z.string().optional(),
-        listId: z.string().optional()
+        listId: z.string().optional(),
+        dueDate: z.string().optional()
     })
 
 
@@ -113,7 +114,7 @@ export async function POST(req: Request) {
 
         // console.log(decoded)
 
-        const { title, description, listId } = result.data;
+        const { title, description, listId, dueDate } = result.data;
 
         if (listId) {
             const list = await prisma.list.findFirst({
@@ -136,7 +137,8 @@ export async function POST(req: Request) {
                 title,
                 description,
                 userId: decoded.id,
-                listId: listId || null
+                listId: listId || null,
+                dueDate: dueDate? new Date(dueDate) : null
             }
         })
 
