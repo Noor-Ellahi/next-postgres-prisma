@@ -51,7 +51,6 @@ const Home = () => {
 
 
   const getList = async () => {
-    // document.cookie = 'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtcDlzZnNhcTAwMDA1Y3Vyd3BudG1ob3AiLCJlbWFpbCI6Im5vb3JAZ21haWwuY29tIiwiaWF0IjoxNzc5MjY3MDI0LCJleHAiOjE3Nzk4NzE4MjR9.eoa8e37B0UfMlv2Spo2TBj5I5TIPNHN5QKuvk0juQPo'
     try {
       const res = await axios.get(
         '/api/list',
