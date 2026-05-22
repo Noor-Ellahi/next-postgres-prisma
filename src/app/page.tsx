@@ -34,10 +34,13 @@ const Home = () => {
   const [taskMenu, setTaskMenu] = useState(false)
   const [listData, setListData] = useState<ListType[] | null>(null)
   const [selectList, setSelectList] = useState<string | null>(null)
+  const [todoInfo, setTodoInfo] = useState<TodoType | null>(null)
 
   const [popup, setPopup] = useState(false)
   const [dropper, setDropper] = useState(false)
+  const [dropper1, setDropper1] = useState(false)
   const [dueDate, setDueDate] = useState<Date>()
+  const [selectDone, setSelectDone] = useState<string | null>(null)
 
   const [openCalendar, setOpenCalendar] = useState(false)
 
@@ -89,6 +92,22 @@ const Home = () => {
       console.log(res)
       // setTodo(res.data.todos.reverse())
       setTodo([...res.data.todos].reverse())
+    } catch (error: any) {
+      toast.error(error.response?.data?.error)
+    }
+  }
+
+  const taskInfo = async (id: any) => {
+
+    console.log(id)
+
+    try {
+      const res = await axios.get(
+        `/api/task/${id}`
+      )
+      console.log(res)
+      setTaskMenu(!taskMenu)
+      setTodoInfo(res.data.todo)
     } catch (error: any) {
       toast.error(error.response?.data?.error)
     }
@@ -231,7 +250,7 @@ const Home = () => {
                 {
                   todo?.map((item, index) => {
                     return (
-                      <li key={index} onClick={() => setTaskMenu(!taskMenu)} className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" />{item.title}</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
+                      <li key={index} onClick={() => taskInfo(item.id)} className="flex py-1 justify-between"><div className="flex gap-3 items-center"><BiCheckbox className="text-2xl text-[#ECECEC]" />{item.title}</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
                     )
                   })
                 }
@@ -256,74 +275,106 @@ const Home = () => {
                     </div>
 
                     <div className="mt-8 flex flex-col text-[#444444] gap-6 p-3 text-sm">
-                      <input type="text" placeholder="Task Text here" className="w-full outline-none" />
+                      <input type="text" placeholder={todoInfo?.title || 'Task text here'} className="w-full outline-none" />
                       {/* <input type="text" placeholder="Description" className="h-20 bg-red-500"/> */}
-                      <textarea rows={4} placeholder="Description" className="outline-none" cols={50}>
+                      <textarea rows={4} placeholder={todoInfo?.description || 'Description'} className="outline-none" cols={50}>
                       </textarea>
                     </div>
 
                     <div className="text-[#444444] flex mt-10 gap-8.5">
                       <div className="flex flex-col gap-5 text-xs">
                         <h3>List</h3>
+                        <h3>Completed</h3>
                         <h3>Due date</h3>
 
                       </div>
                       <div className="flex relative flex-col gap-5 text-xs">
-                        <h3 onClick={() => setDropper(!dropper)} className="flex items-center gap-3">{selectList ? selectList : "Options"} <GrDown className="text-[8px]" /></h3>
-                        {dropper ?
-                          (
-                            <ul className="flex absolute bottom-[-70] select-none gap-1 bg-[#fAFAFA] p-1 flex-col">
-                              {
-                                listData?.map((item, index) => {
-                                  return (
+                        <h3
+                          onClick={() =>{
+                            setDropper(!dropper)
+                          setDropper1(false)
+                          }}
 
-                                    <li className="text-sm hover:bg-[#7c7c7c] p-1 transition" onClick={() => {
-                                      setSelectList(item.name)
-                                      setDropper(false)
-                                    }} key={index}>{item.name}</li>
+                        className="flex items-center gap-3"
+                          >{selectList ? selectList : "Options"} <GrDown className="text-[8px]" /></h3>
+                      {dropper ?
+                        (
+                          <ul className="flex absolute bottom-[-40] select-none gap-1 bg-[#fAFAFA] p-1 flex-col">
+                            {
+                              listData?.map((item, index) => {
+                                return (
 
-                                  )
-                                })
-                              }
-                            </ul>
-                          ) : null
-                        }
+                                  <li className="text-sm hover:bg-[#7c7c7c] p-1 transition" onClick={() => {
+                                    setSelectList(item.name)
+                                    setDropper(false)
+                                    console.log(item)
+                                  }} key={index}>{item.name}</li>
+
+                                )
+                              })
+                            }
+                          </ul>
+                        ) : null
+                      }
+
+                      <h3 onClick={() => {
+                        setDropper1(!dropper1)
+                        setDropper(false)
+                        }} className="flex items-center gap-3">{selectDone ? selectDone : "Options"} <GrDown className="text-[8px]" /></h3>
+                      {dropper1 ?
+                        (
+                          <ul className="flex absolute bottom-[-40] select-none gap-1 bg-[#fAFAFA] p-1 flex-col">
+                            {
+                              ['Done', 'NotDone'].map((item, ind) => {
+                                return (
+                                  <li key={ind} onClick={() => {
+                                    setSelectDone(item)
+                                    setDropper1(false)
+                                    console.log(item)
+                                  }} className="text-sm hover:bg-[#7c7c7c] p-1 transition">{item}</li>
+                                )
+                              })
+                            }
+
+                          </ul>
+                        ) : (null)
+                      }
 
 
-                        <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(!openCalendar)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
-                        {
-                          openCalendar ?
-                            <Calendar
-                              date={dueDate}
-                              setDate={setDueDate}
-                              setOpenCalendar={setOpenCalendar}
-                            /> : null
-                        }
-                        {/* <input type="date"  /> */}
+                      <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(!openCalendar)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
+                      {
+                        openCalendar ?
+                          <Calendar
+                            date={dueDate}
+                            setDate={setDueDate}
+                            setOpenCalendar={setOpenCalendar}
+                          /> : null
+                      }
+                      {/* <input type="date"  /> */}
 
 
-                      </div>
                     </div>
-
-                  </div>
-                  <div className="flex justify-around text-sm">
-                    <button className="px-7 py-2 bg-[#F4F4F4] hover:bg-[#7c7c7c] transition border border-[#C7C6C5] rounded-sm">Delete Task</button>
-                    <button className="px-5 py-2 bg-[#FED44D] hover:bg-[#A88D3C] transition hover:text-[#7c7c7c] rounded-sm">Save Changes</button>
                   </div>
 
                 </div>
+                <div className="flex justify-around text-sm">
+                  <button className="px-7 py-2 bg-[#F4F4F4] hover:bg-[#7c7c7c] transition border border-[#C7C6C5] rounded-sm">Delete Task</button>
+                  <button className="px-5 py-2 bg-[#FED44D] hover:bg-[#A88D3C] transition hover:text-[#7c7c7c] rounded-sm">Save Changes</button>
+                </div>
+
+              </div>
 
 
               </div>
-            ) : null
+      ) : null
         }
 
 
 
-      </div>
-      {/* {JSON.stringify(tests , null, 2)} */}
-      {/* <h1>hi</h1> */}
     </div>
+      {/* {JSON.stringify(tests , null, 2)} */ }
+  {/* <h1>hi</h1> */ }
+    </div >
   )
 }
 
