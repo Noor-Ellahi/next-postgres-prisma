@@ -48,6 +48,10 @@ const Home = () => {
 
   const [task, setTask] = useState(null)
 
+  const [newTitle, setNewTitle] = useState('')
+  const [newDesc, setNewDesc] = useState('')
+
+
 
 
   const [title, setTitle] = useState('')
@@ -113,6 +117,63 @@ const Home = () => {
     }
   }
 
+
+  const saveTask = async () => {
+
+
+    const findList = listData?.find((it) => it.name === selectList)
+
+    const findIt = findList?.id || null
+
+    // console.log(findIt)
+
+    // if(selectDone === 'Done'){
+    //   setSelectDone(true)
+    // }else{setSelectDone(false)}
+
+    const data: any = {}
+
+    if (newTitle) data.title = newTitle
+    if (newDesc) data.description = newDesc
+    if (selectDone !== undefined) {
+      data.compeleted =  selectDone === 'Done'
+    }
+
+    if (findList?.id) {
+      data.listId = findList.id
+    }
+
+    if (dueDate) {
+      data.dueDate = dueDate
+    }
+
+
+    setNewDesc('')
+    setNewTitle('')
+    setSelectDone('')
+    setSelectList('')
+    setDueDate(undefined)
+
+
+    try {
+      const res = await axios.patch(
+        `/api/task/${todoInfo?.id}`
+        , data
+        // , {
+        //   title: newTitle ? newTitle : todoInfo?.title,
+        //   description: newDesc ? newDesc : null,
+        //   completed: selectDone ?? null,
+        //   listId: findIt ? findIt : null,
+        //   dueDate: dueDate ? dueDate : null
+        // }
+      )
+
+    } catch (error: any) {
+      toast.error(error.response?.data?.error)
+      console.log(error)
+
+    }
+  }
 
   useEffect(() => {
     getList()
@@ -275,9 +336,9 @@ const Home = () => {
                     </div>
 
                     <div className="mt-8 flex flex-col text-[#444444] gap-6 p-3 text-sm">
-                      <input type="text" placeholder={todoInfo?.title || 'Task text here'} className="w-full outline-none" />
+                      <input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder={todoInfo?.title || 'Task text here'} className="w-full outline-none" />
                       {/* <input type="text" placeholder="Description" className="h-20 bg-red-500"/> */}
-                      <textarea rows={4} placeholder={todoInfo?.description || 'Description'} className="outline-none" cols={50}>
+                      <textarea rows={4} value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder={todoInfo?.description || 'Description'} className="outline-none" cols={50}>
                       </textarea>
                     </div>
 
@@ -290,90 +351,90 @@ const Home = () => {
                       </div>
                       <div className="flex relative flex-col gap-5 text-xs">
                         <h3
-                          onClick={() =>{
+                          onClick={() => {
                             setDropper(!dropper)
-                          setDropper1(false)
+                            setDropper1(false)
                           }}
 
-                        className="flex items-center gap-3"
-                          >{selectList ? selectList : "Options"} <GrDown className="text-[8px]" /></h3>
-                      {dropper ?
-                        (
-                          <ul className="flex absolute bottom-[-40] select-none gap-1 bg-[#fAFAFA] p-1 flex-col">
-                            {
-                              listData?.map((item, index) => {
-                                return (
+                          className="flex items-center gap-3"
+                        >{selectList ? selectList : "Options"} <GrDown className="text-[8px]" /></h3>
+                        {dropper ?
+                          (
+                            <ul className="flex absolute bottom-[-40] select-none gap-1 bg-[#fAFAFA] p-1 flex-col">
+                              {
+                                listData?.map((item, index) => {
+                                  return (
 
-                                  <li className="text-sm hover:bg-[#7c7c7c] p-1 transition" onClick={() => {
-                                    setSelectList(item.name)
-                                    setDropper(false)
-                                    console.log(item)
-                                  }} key={index}>{item.name}</li>
+                                    <li className="text-sm hover:bg-[#7c7c7c] p-1 transition" onClick={() => {
+                                      setSelectList(item.name)
+                                      setDropper(false)
+                                      console.log(item)
+                                    }} key={index}>{item.name}</li>
 
-                                )
-                              })
-                            }
-                          </ul>
-                        ) : null
-                      }
+                                  )
+                                })
+                              }
+                            </ul>
+                          ) : null
+                        }
 
-                      <h3 onClick={() => {
-                        setDropper1(!dropper1)
-                        setDropper(false)
+                        <h3 onClick={() => {
+                          setDropper1(!dropper1)
+                          setDropper(false)
                         }} className="flex items-center gap-3">{selectDone ? selectDone : "Options"} <GrDown className="text-[8px]" /></h3>
-                      {dropper1 ?
-                        (
-                          <ul className="flex absolute bottom-[-40] select-none gap-1 bg-[#fAFAFA] p-1 flex-col">
-                            {
-                              ['Done', 'NotDone'].map((item, ind) => {
-                                return (
-                                  <li key={ind} onClick={() => {
-                                    setSelectDone(item)
-                                    setDropper1(false)
-                                    console.log(item)
-                                  }} className="text-sm hover:bg-[#7c7c7c] p-1 transition">{item}</li>
-                                )
-                              })
-                            }
+                        {dropper1 ?
+                          (
+                            <ul className="flex absolute bottom-[-40] select-none gap-1 bg-[#fAFAFA] p-1 flex-col">
+                              {
+                                ['Done', 'NotDone'].map((item, ind) => {
+                                  return (
+                                    <li key={ind} onClick={() => {
+                                      setSelectDone(item)
+                                      setDropper1(false)
+                                      console.log(item)
+                                    }} className="text-sm hover:bg-[#7c7c7c] p-1 transition">{item}</li>
+                                  )
+                                })
+                              }
 
-                          </ul>
-                        ) : (null)
-                      }
-
-
-                      <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(!openCalendar)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
-                      {
-                        openCalendar ?
-                          <Calendar
-                            date={dueDate}
-                            setDate={setDueDate}
-                            setOpenCalendar={setOpenCalendar}
-                          /> : null
-                      }
-                      {/* <input type="date"  /> */}
+                            </ul>
+                          ) : (null)
+                        }
 
 
+                        <h3 className="flex items-center gap-3" onClick={() => setOpenCalendar(!openCalendar)}>{dueDate ? new Date(dueDate).toLocaleDateString() : "Select"} <GrDown className="text-[8px]" /></h3>
+                        {
+                          openCalendar ?
+                            <Calendar
+                              date={dueDate}
+                              setDate={setDueDate}
+                              setOpenCalendar={setOpenCalendar}
+                            /> : null
+                        }
+                        {/* <input type="date"  /> */}
+
+
+                      </div>
                     </div>
+
+                  </div>
+                  <div className="flex justify-around text-sm">
+                    <button className="px-7 py-2 bg-[#F4F4F4] hover:bg-[#7c7c7c] transition border border-[#C7C6C5] rounded-sm">Delete Task</button>
+                    <button onClick={() => saveTask()} className="px-5 py-2 bg-[#FED44D] hover:bg-[#A88D3C] transition hover:text-[#7c7c7c] rounded-sm">Save Changes</button>
                   </div>
 
                 </div>
-                <div className="flex justify-around text-sm">
-                  <button className="px-7 py-2 bg-[#F4F4F4] hover:bg-[#7c7c7c] transition border border-[#C7C6C5] rounded-sm">Delete Task</button>
-                  <button className="px-5 py-2 bg-[#FED44D] hover:bg-[#A88D3C] transition hover:text-[#7c7c7c] rounded-sm">Save Changes</button>
-                </div>
-
-              </div>
 
 
               </div>
-      ) : null
+            ) : null
         }
 
 
 
-    </div>
-      {/* {JSON.stringify(tests , null, 2)} */ }
-  {/* <h1>hi</h1> */ }
+      </div>
+      {/* {JSON.stringify(tests , null, 2)} */}
+      {/* <h1>hi</h1> */}
     </div >
   )
 }

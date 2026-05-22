@@ -69,8 +69,8 @@ const updateTodoSchema = z.object({
   title: z.string().min(1, "Title is required").optional(),
   description: z.string().optional(),
   listId: z.string().optional(),
-  dueDate: z.string().optional()
-  // completed: z.boolean().optional(),
+  dueDate: z.string().optional(),
+  compeleted: z.boolean().optional(),
 });
 
 export async function PATCH(
@@ -117,7 +117,7 @@ export async function PATCH(
       );
     }
     // , completed 
-    const { title, description } = result.data;
+    const { title, description, compeleted, listId, dueDate } = result.data;
 
     // 4. Check if todo exists AND belongs to user
     const existingTodo = await prisma.task.findFirst({
@@ -142,7 +142,9 @@ export async function PATCH(
       data: {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
-        // ...(completed !== undefined && { completed }),
+        ...(compeleted !== undefined && { compeleted }),
+        ...(listId !== undefined && { listId }),
+        ...(dueDate !== undefined && { dueDate: new Date(dueDate) }),
       },
     });
 
@@ -152,6 +154,8 @@ export async function PATCH(
       todo: updatedTodo,
     });
   } catch (error) {
+
+    console.log(error)
     return NextResponse.json(
       { error: "Server error" },
       { status: 500 }
