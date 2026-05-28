@@ -59,6 +59,7 @@ model Task {
   description String?
 
   compeleted Boolean @default(false)
+  createdAt DateTime @default(now())
 
   dueDate DateTime?
 

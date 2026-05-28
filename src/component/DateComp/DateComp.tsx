@@ -9,7 +9,8 @@ import 'react-day-picker/dist/style.css';
 
 type Props = {
     date: Date | undefined
-    setDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+    // setDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+    setDate: (date: Date | undefined) => void
     setOpenCalendar: React.Dispatch<React.SetStateAction<boolean>>
 }
 
