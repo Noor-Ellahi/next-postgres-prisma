@@ -1,11 +1,14 @@
 'use client'
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight, BiSearch, BiCalendar, BiListOl, BiGridSmall, BiSolidSquare, BiLogOut, BiCross } from "react-icons/bi";
 import { GrClose, GrDown } from "react-icons/gr";
 import Calendar from "@/component/DateComp/DateComp";
 import { toast } from "sonner";
 import TaskPanel from "@/component/TaskInfo/TaskInfo";
+import { useRouter } from "next/navigation";
+
+
 // import TaskInfo from "@/component/TaskInfo/TaskInfo";
 
 
@@ -28,6 +31,7 @@ type TodoType = {
 
 const Home = () => {
 
+  const router = useRouter()
 
 
   const colors = [
@@ -38,7 +42,7 @@ const Home = () => {
   const [taskMenu, setTaskMenu] = useState(false)
   const [listData, setListData] = useState<ListType[] | null>(null)
   const [todoInfo, setTodoInfo] = useState<TodoType | null>(null)
-  
+
 
   const [popup, setPopup] = useState(false)
   const [dropper, setDropper] = useState(false)
@@ -48,7 +52,8 @@ const Home = () => {
   const [openCalendar, setOpenCalendar] = useState(false)
 
   const [todo, setTodo] = useState<TodoType[]>([])
-  const [filteredTodo, setFilteredTodo] = useState<TodoType[]>([]);
+  // const [filteredTodo, setFilteredTodo] = useState<TodoType[]>([]);
+  const [UiChanger, setUiChanger] = useState('All')
 
 
   const [taskForm, setTaskForm] = useState({
@@ -64,6 +69,53 @@ const Home = () => {
 
 
   const [title, setTitle] = useState('')
+
+  const filteredTodo = useMemo(() => {
+
+    if (UiChanger === 'today') {
+
+      const today = new Date().toDateString()
+
+      return todo.filter((item) => {
+
+        if (item.createdAt) {
+          return new Date(item.createdAt).toDateString() === today
+        }
+
+        return false
+      })
+    }
+
+
+    const selectedList = listData?.find(
+      (list) => list.name === UiChanger
+    );
+
+    // console.log(selectedList)
+
+    if (selectedList) {
+      return todo.filter(
+        (item) => item.listId === selectedList.id
+      );
+    }
+
+
+
+    return todo
+
+  }, [todo, UiChanger])
+
+  const todayTodos = todo.filter((item) => {
+
+    if (item.createdAt) {
+      return (
+        new Date(item.createdAt).toDateString() ===
+        new Date().toDateString()
+      )
+    }
+
+    return false
+  })
 
 
   const getList = async () => {
@@ -103,30 +155,48 @@ const Home = () => {
       )
       console.log(res)
       setTodo([...res.data.todos].reverse())
-      setFilteredTodo([...res.data.todos].reverse())
+      // setFilteredTodo([...res.data.todos].reverse())
+
     } catch (error: any) {
       toast.error(error.response?.data?.error)
     }
   }
 
   const getTask = (all: string) => {
-    if (all === 'today') {
-      const today = new Date().toDateString()
 
-      const find = todo.filter((item) => {
-        if (item.createdAt) {
-          return today === new Date(item.createdAt).toDateString()
-        }
-      })
-      // console.log(find)
-      // console.log(todo)
-      setFilteredTodo(find)
-    }else {
-      setFilteredTodo(todo)
+    console.log(all)
+
+
+    if (all === 'today') {
+      setUiChanger('today')
+    }
+    else {
+      setUiChanger('All')
     }
 
-
   };
+
+  const getListTask = (name: string, id: string) => {
+    console.log(name, id)
+    // const find = todo.filter((it) => {
+    //   if (it.listId) {
+    //     return it.listId === id
+    //   }
+    // })
+
+    setUiChanger(name)
+
+    console.log(filteredTodo)
+
+    // console.log(find)
+
+    // const find = todo.filter((item) => {
+    //   if (item.listId) {
+    //     return item.listId === all
+    //   }
+    // })
+    // console.log(find)
+  }
 
   const taskInfo = async (id: string) => {
     try {
@@ -192,6 +262,7 @@ const Home = () => {
 
 
 
+
   const delTask = async () => {
     try {
 
@@ -206,6 +277,20 @@ const Home = () => {
       console.log(error)
     }
   }
+
+
+  const signOut = async () => {
+    try {
+      const res = await axios.post(
+        '/api/auth/logout'
+      )
+      router.push('/login')
+    } catch (error: any) {
+      console.log("error ouccured", error)
+      toast.error(error.response?.data?.error)
+    }
+  }
+
 
   useEffect(() => {
     getList()
@@ -239,8 +324,24 @@ const Home = () => {
               <div>
                 <ul className="text-[16px] flex gap-1 flex-col">
                   <li className="text-[12px] text-[#44556B] font-bold">TASKS</li>
-                  <li className=" text-[#7C7C7C] cursor-pointer flex items-center p-2 gap-3 hover:bg-[#EBEBEB] mt-1" onClick={() => getTask('allTask')}><BiGridSmall  className="text-xl" /> All tasks</li>
-                  <li className="text-[#7C7C7C] cursor-pointer flex items-center p-2 gap-3 hover:bg-[#EBEBEB]" onClick={() => getTask('today')}><BiListOl className="text-xl" /> Today</li>
+                  <li className=" text-[#7C7C7C] cursor-pointer justify-between flex items-center p-2 gap-3 hover:bg-[#EBEBEB] mt-1" onClick={() => getTask('allTask')}>
+                    <div className="flex items-center gap-3">
+                      <BiGridSmall className="text-xl" />
+                      All tasks
+                    </div>
+                    <span className="text-xs px-2 font-bold text-[#444964] rounded-[3px] bg-[#E3e2e1]">
+                      {todo.length}
+                    </span>
+                  </li>
+                  <li className="text-[#7C7C7C] cursor-pointer justify-between flex items-center p-2 gap-3 hover:bg-[#EBEBEB]" onClick={() => getTask('today')}>
+                    <div className="flex items-center gap-3">
+                      <BiListOl className="text-xl" />
+                      Today
+                    </div>
+                    <span className="text-xs px-2 font-bold text-[#444964] rounded-[3px] bg-[#E3e2e1]">
+                      {todayTodos.length}
+                    </span>
+                  </li>
                   <li className="text-[#7C7C7C] cursor-pointer flex items-center p-2 gap-3 hover:bg-[#EBEBEB]"><BiCalendar className="text-xl" />Calender</li>
                 </ul>
                 {/* #E3E2E1 */}
@@ -253,14 +354,17 @@ const Home = () => {
                   <li className="text-[12px] text-[#44556B] font-bold">LISTS</li>
                   {
                     listData?.map((items, index) => {
-                      // console.log(items.name)
+                      const taskCount = todo.filter(
+                        (task) => task.listId === items.id
+                      ).length;
+                      // console.log(taskCount)
                       return (
-                        <li key={index} className={` text-[#7C7C7C] p-2 flex justify-between items-center  hover:bg-[#Ebebeb] ${index == 0 ? 'mt-1' : ''} `}>
+                        <li key={index} onClick={() => getListTask(items.name, items.id)} className={` text-[#7C7C7C] p-2 flex justify-between items-center  hover:bg-[#Ebebeb] ${index == 0 ? 'mt-1' : ''} `}>
                           <div className="flex items-center gap-3">
                             <BiSolidSquare style={{ color: colors[index] }} className={` rounded-xl text-xl`} /> {items.name}
                           </div>
                           <span className="text-xs px-2 font-bold text-[#444964] rounded-[3px] bg-[#E3e2e1]">
-                            5
+                            {taskCount}
                           </span>
                         </li>
                       )
@@ -289,7 +393,7 @@ const Home = () => {
           </div>
 
           <div>
-            <button className="flex w-full p-2 hover:bg-[#ebebeb] items-center gap-3 text-sm text-[#7C7C7C]">
+            <button onClick={() => signOut()} className="flex w-full p-2 hover:bg-[#ebebeb] items-center gap-3 text-sm text-[#7C7C7C]">
               <BiLogOut />
               Sign out
             </button>
@@ -302,8 +406,8 @@ const Home = () => {
             <div className="flex gap-25 items-center">
               <BiMenu className={`text-3xl ${menu ? "" : "hidden"} text-[#7C7C7C]`} onClick={() => setMenu(!menu)} />
               <div className="flex gap-9">
-                <h1 className="text-5xl">Today</h1>
-                <h2 className="text-3xl px-3 py-1 rounded-lg border-2 border-[#F3F3F3]">5</h2>
+                <h1 className="text-5xl">{UiChanger}</h1>
+                <h2 className="text-3xl px-3 py-1 rounded-lg border-2 border-[#F3F3F3]">{filteredTodo.length}</h2>
               </div>
             </div>
           </div>
@@ -332,11 +436,17 @@ const Home = () => {
               <ul className="flex text-[15px] flex-col gap-6 text-[#444444] pt-5 p-2">
 
                 {
-                  filteredTodo?.map((item, index) => {
-                    return (
-                      <li key={index} onClick={() => taskInfo(item.id)} className="flex py-1 cursor-pointer justify-between"><div className="flex gap-3 items-center">{item.compeleted ? <BiCheckboxChecked className="text-2xl text-[#FED44D] " /> : <BiCheckbox className="text-2xl text-[#ECECEC]" />}{item.title}</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
+                  filteredTodo && filteredTodo.length > 0 ?
+                    (
+                      filteredTodo?.map((item, index) => {
+                        return (
+                          <li key={index} onClick={() => taskInfo(item.id)} className="flex py-1 cursor-pointer justify-between"><div className="flex gap-3 items-center">{item.compeleted ? <BiCheckboxChecked className="text-2xl text-[#FED44D] " /> : <BiCheckbox className="text-2xl text-[#ECECEC]" />}{item.title}</div> <BiChevronRight className="text-2xl text-[#7D7D7D]" /></li>
+                        )
+                      })
+                    ) :
+                    (
+                      <li className="flex py-1 cursor-pointer justify-between"><div className="flex gap-3 items-center">No recent list</div></li>
                     )
-                  })
                 }
 
 
@@ -397,7 +507,7 @@ const Home = () => {
                         }}
                       />
                       <textarea
-                        value={taskForm.description}
+                        value={taskForm.description || ''}
                         placeholder={todoInfo?.description || "Type description here"}
                         onChange={(e) =>
                           setTaskForm((prev) => ({
