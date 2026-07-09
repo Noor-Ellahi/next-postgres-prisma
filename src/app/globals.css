@@ -12,10 +12,13 @@
 } */
 
 [data-sonner-toast][data-type="success"] svg {
-  color: #FACC15; /* yellow tick */
+  color: #FACC15;
+  /* yellow tick */
 }
+
 [data-sonner-toast][data-type="error"] svg {
-  color: #f31b1b; /* yellow tick */
+  color: #f31b1b;
+  /* yellow tick */
 }
 
 /* @theme inline {
@@ -37,4 +40,21 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   font-family: lexan; */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 1px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c4c4c4;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
 }

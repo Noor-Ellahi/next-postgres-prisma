@@ -1,6 +1,6 @@
 'use client'
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BiMenu, BiPlus, BiCheckbox, BiCheckboxChecked, BiChevronRight, BiSearch, BiCalendar, BiListOl, BiGridSmall, BiSolidSquare, BiLogOut, BiCross } from "react-icons/bi";
 import { GrClose, GrDown } from "react-icons/gr";
 import Calendar from "@/component/DateComp/DateComp";
@@ -33,6 +33,7 @@ const Home = () => {
 
   const router = useRouter()
 
+  const listRef = useRef<HTMLInputElement>(null)
 
   const colors = [
     '#96a4f7ff', '#FE6A6E', '#68D9E7', '#FED44D', '#B4FEB6', '#A580A4'
@@ -260,7 +261,20 @@ const Home = () => {
 
 
 
-
+  const makeList = async()=>{
+    try {
+      const res = await axios.post(
+        '/api/list',
+        {
+          listName : listRef.current?.value
+        }
+      )
+      getList()
+    } catch (error : any) {
+      toast.error(error.response?.data?.error)
+      console.log(error)
+    }
+  }
 
 
   const delTask = async () => {
@@ -300,9 +314,9 @@ const Home = () => {
   return (
     <div className="h-screen w-full flex justify-center items-center bg-gray-400">
 
-      <div className={`w-[80%] flex rounded-tr-xl ${menu ? "" : "p-5"} rounded-tl-xl bg-[#FAFAFA] h-[90%]`}>
+      <div className={`w-[90%] xl:w-[80%] flex rounded-tr-xl ${menu ? "" : "p-5"} rounded-tl-xl bg-[#FAFAFA] max-xl:h-[95%] h-[90%]`}>
 
-        <div className={`w-[25%] flex flex-col justify-between p-5 ${menu ? 'hidden' : ''}  bg-[#F2F2F2]`}>
+        <div className={`w-[25%] max-xl:w-[35%] flex flex-col justify-between p-5 ${menu ? 'hidden' : ''}  bg-[#F2F2F2]`}>
 
           <div>
             <div className="flex justify-between">
@@ -350,7 +364,7 @@ const Home = () => {
 
             <div className="mt-7.5">
               <div>
-                <ul className="text-[16px] flex gap-1 flex-col">
+                <ul className="text-[16px] flex gap-1 flex-col  max-h-[200px] custom-scrollbar overflow-y-auto">
                   <li className="text-[12px] text-[#44556B] font-bold">LISTS</li>
                   {
                     listData?.map((items, index) => {
@@ -374,10 +388,10 @@ const Home = () => {
                     popup ?
                       (
                         <div className=" p-3 bg-[#Ebebeb]">
-                          <input type="text" placeholder="List name" className="text-sm text-[#7c7c7c] w-full outline-none border  border-[#7c7c7c] p-1 rounded" />
+                          <input ref={listRef} type="text" placeholder="List name" className="text-sm text-[#7c7c7c] w-full outline-none border  border-[#7c7c7c] p-1 rounded" />
                           <div className="flex text-sm text-[#7c7c7c] justify-between">
                             <button onClick={() => setPopup(false)} className="w-1/2 py-3">CANCEL</button>
-                            <button className="w-1/2 py-3">ADD</button>
+                            <button onClick={() => makeList()} className="w-1/2 py-3">ADD</button>
                           </div>
                         </div>
                       )
